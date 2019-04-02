@@ -1,0 +1,106 @@
+To see DAG on the console:
+rdd.toDebugString
+
+
+Val number = sc.textFile(“f.txt”)
+Val Upper = number.map(line => line.toUpperCase)
+Val startsWith = Upper.filter(line => line.startsWith(“I”)
+startsWith.collect
+
+
+To Combine some files together:
+sc.textFile(directory/*)
+sc.textFIle(directory/A.log, directory/B.log, directory/C.txt)
+
+
+Spark-submit:
+spark-submit --class "Main" --master local[*] C:\Users\hepa0816\eclipse-workspace\Line_count\target\Line_count-0.0.1-SNAPSHOT.jar
+
+
+creating RDD's from parallelize
+
+val num = sc.parallelize(1 to 1000)
+val num2 = sc.parallelize(1001 to 100000)
+val num3 = num.union(num2)
+num3.take(10)
+
+or
+from an existing collection
+
+val myData = ["H", "S", "K"]
+val myRDD = sc.parallelize(myData)
+myRDD.collect
+myRDD.take(2)
+
+to Save the RDD value in a textFile:
+rdd.saveAsTextFile("directory")
+
+Map Splits the lines into array of elements
+if we split the lines with space:
+it creates Array(Array(elements))
+
+FlatMap splits them to array of elements with spaces
+
+We can also use distinct api to remove the duplicate elements
+
+rdd1.subtract(rdd2)
+rdd1.zip(rdd2)
+rdd1.union(rdd2)
+
+zip creates key value pairs
+
+
+
+case class Person(name: String, age: Int)
+val personRDD = sc.makeRDD(Seq(Person("A",10), Person("B",20)))
+val personDF = personRDD.toDF
+personDF.filter("age > 10").show
+personDF.filter("salary > 10").show
+
+
+personDF.rdd
+val ds = personDF.as[Person]
+ds.show
+ds.filter(p => p.age > 25)
+ds.filter(p => p.salary> 30)
+
+
+val myRdd = sc.parallelize(Seq(1,2,3,4,5,6))
+myRdd.reduce(_+_)
+
+List( 1, 2, 3, 4 ).reduce( (x,y) => x + y )
+Step 1 : op( 1, 2 ) will be the first evaluation. 
+  Start with 1, 2, that is 
+    x is 1  and  y is 2
+Step 2:  op( op( 1, 2 ), 3 ) - take the next element 3
+  Take the next element 3: 
+    x is op(1,2) = 3   and y = 3
+Step 3:  op( op( op( 1, 2 ), 3 ), 4) 
+  Take the next element 4: 
+    x is op(op(1,2), 3 ) = op( 3,3 ) = 6    and y is 4
+	
+	
+spark standalone cluster:
+
+spark-class org.apache.spark.deploy.master.Master 
+spark-class org.apache.spark.deploy.worker.Worker spark://10.235.14.125:7077 
+spark-shell --master spark://10.235.14.125:7077
+
+
+1. Parallelized collections:
+Val v1= sc.parallelize(1 to 1000)
+Val v2= sc.parallelize(1001 t0 10000000)
+Val v3 = v1.union(v2)
+V3.collect
+
+
+2. Reading from text file:
+val readFile = sc.textFile("C:/Users/hepa0816/Desktop/HSK/spark/Examples/1.txt")
+val mapRDD = readFile.map(HSK => HSK.toUpper)
+val filterRDD = mapRDD.filter(HSK=>HSK.startsWith("I"))
+filterRDD.collect
+
+
+sc.parallelize will take numSlices or defaultParallelism.
+
+sc.textFile will take the maximum between minPartitions and the number of splits computed based on hadoop input split size divided by the block size
